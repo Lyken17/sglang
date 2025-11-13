@@ -33,6 +33,7 @@ Usage:
 
 import argparse
 import logging
+import os
 import time
 from datetime import datetime
 from typing import List, Optional
@@ -373,15 +374,26 @@ def get_default_batch_sizes() -> List[int]:
 
 def main(args):
     # Initialize distributed environment
-    if not dist.is_initialized():
-        dist.init_process_group(backend="nccl")
+    from sglang.srt.distributed.parallel_state import init_distributed_environment
     
-    world_size = dist.get_world_size()
-    rank = dist.get_rank()
-    device = torch.device(f"cuda:{rank}")
+    world_size = int(os.environ.get("WORLD_SIZE", "1"))
+    rank = int(os.environ.get("RANK", "0"))
+    local_rank = int(os.environ.get("LOCAL_RANK", "0"))
     
     if world_size < 2:
         raise ValueError("AllReduce tuning requires at least 2 GPUs")
+    
+    # Initialize distributed environment (this will create _WORLD group)
+    init_distributed_environment(
+        world_size=world_size,
+        rank=rank,
+        local_rank=local_rank,
+        distributed_init_method="env://",
+        backend="nccl",
+    )
+    
+    device = torch.device(f"cuda:{local_rank}")
+    torch.cuda.set_device(device)
     
     # Initialize model parallel
     initialize_model_parallel(tensor_model_parallel_size=world_size)
