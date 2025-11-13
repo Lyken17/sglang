@@ -304,7 +304,7 @@ class _DeepEPDispatcherImplBase:
 
         self.params_bytes = 2
         self.num_max_dispatch_tokens_per_rank = get_int_env_var(
-            "SGLANG_DEEPEP_NUM_MAX_DISPATCH_TOKENS_PER_RANK", 128
+            "SGLANG_DEEPEP_NUM_MAX_DISPATCH_TOKENS_PER_RANK", 256
         )
         # DeepEP internode_ll dispatch uses FINISHED_SUM_TAG=1024
         # and the logic requires num-tokens-sent-from-one-rank-to-another-rank less than it
@@ -514,6 +514,7 @@ class _DeepEPDispatcherImplLowLatency(_DeepEPDispatcherImplBase):
         self.return_recv_hook = return_recv_hook
         self.device_module = torch.get_device_module()
         self.quant_config = {}
+        self._get_buffer()
 
     def dispatch_a(
         self,
