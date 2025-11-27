@@ -30,6 +30,7 @@ import gc
 import time
 import unittest
 
+import torch
 from nightly_utils import NightlyBenchmarkRunner
 
 from sglang.test.test_utils import DEFAULT_URL_FOR_TEST
@@ -189,7 +190,10 @@ class TestNeurIPSTPMoEConfigs(unittest.TestCase):
 
                         # Force garbage collection and wait for GPU memory to clear
                         gc.collect()
-                        time.sleep(5)
+                        if torch.cuda.is_available():
+                            torch.cuda.empty_cache()
+                            torch.cuda.synchronize()
+                        time.sleep(10)
                 else:
                     # Native-precision MoE models: No MoE backend flag, use defaults
                     ep_str = "_EP2" if (is_moe and tp_size == 8) else ""
@@ -222,7 +226,10 @@ class TestNeurIPSTPMoEConfigs(unittest.TestCase):
 
                     # Force garbage collection and wait for GPU memory to clear
                     gc.collect()
-                    time.sleep(5)
+                    if torch.cuda.is_available():
+                        torch.cuda.empty_cache()
+                        torch.cuda.synchronize()
+                    time.sleep(10)
 
         # Write final report to GitHub summary
         self.runner.write_final_report()
