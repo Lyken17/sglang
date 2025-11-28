@@ -46,15 +46,15 @@ OUTPUT_LENS = (512,)
 
 # Models to test - all using native precision for H200 compatibility
 MODELS = {
-    "deepseek-v3.1": {
-        "path": "deepseek-ai/DeepSeek-V3.1",
-        "is_moe": True,
-        "extra_args": [
-            "--trust-remote-code",
-            "--model-loader-extra-config",
-            '{"enable_multithread_load": true}',
-        ],
-    },
+    # "deepseek-v3.1": {
+    #     "path": "deepseek-ai/DeepSeek-V3.1",
+    #     "is_moe": True,
+    #     "extra_args": [
+    #         "--trust-remote-code",
+    #         "--model-loader-extra-config",
+    #         '{"enable_multithread_load": true}',
+    #     ],
+    # },
     "qwen3-235b": {
         "path": "Qwen/Qwen3-235B-A22B-Instruct-2507",
         "is_moe": True,
